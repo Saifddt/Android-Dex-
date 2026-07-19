@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Fondo de escritorio personalizable -->
+    <ImageView
+        android:id="@+id/desktopWallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:background="@color/desktop_fallback_bg"
+        android:contentDescription="@null" />
+
+    <!-- Grid de iconos anclados en el escritorio -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/desktopGrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
+        android:paddingTop="24dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:clipToPadding="false" />
+
+    <!-- Barra inferior tipo taskbar de Windows -->
+    <LinearLayout
+        android:id="@+id/taskbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/taskbar_bg"
+        android:elevation="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp">
+
+        <ImageButton
+            android:id="@+id/btnStart"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_start"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/start_menu" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/clockText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:text="00:00" />
+    </LinearLayout>
+
+    <!-- Menú Inicio (oculto por defecto) -->
+    <LinearLayout
+        android:id="@+id/startMenu"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|start"
+        android:orientation="vertical"
+        android:background="@color/start_menu_bg"
+        android:elevation="12dp"
+        android:visibility="gone"
+        android:padding="12dp">
+
+        <EditText
+            android:id="@+id/searchBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_apps"
+            android:textColorHint="#AAAAAA"
+            android:textColor="#FFFFFF"
+            android:background="#331F1F1F"
+            android:padding="10dp"
+            android:layout_marginBottom="8dp"
+            android:inputType="text" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/allAppsList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnChangeWallpaper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/change_wallpaper"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+</FrameLayout>

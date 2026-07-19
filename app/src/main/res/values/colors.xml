@@ -1,0 +1,7 @@
+<resources>
+    <color name="taskbar_bg">#DD1F1F1F</color>
+    <color name="accent_blue">#0078D4</color>
+    <color name="icon_label_text">#FFFFFFFF</color>
+    <color name="start_menu_bg">#F2202020</color>
+    <color name="desktop_fallback_bg">#0A2A43</color>
+</resources>

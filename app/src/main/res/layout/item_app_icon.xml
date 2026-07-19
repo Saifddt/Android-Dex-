@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="88dp"
+    android:layout_height="96dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="?attr/selectableItemBackground"
+    android:padding="4dp">
+
+    <!-- Sin clipToOutline circular: mantiene el icono cuadrado, look Windows -->
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/appLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/icon_label_text"
+        android:textSize="11sp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:shadowColor="#000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="4" />
+
+</LinearLayout>
