@@ -44,10 +44,15 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/start_menu" />
 
-        <View
+        <!-- Apps abiertas: aparecen acá al abrirlas desde el grid o el menú inicio -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/runningAppsBar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal"
+            android:clipToPadding="false" />
 
         <TextView
             android:id="@+id/clockText"

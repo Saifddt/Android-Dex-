@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var desktopGrid: RecyclerView
     private lateinit var allAppsList: RecyclerView
+    private lateinit var runningAppsBar: RecyclerView
     private lateinit var startMenu: android.widget.LinearLayout
     private lateinit var searchBox: EditText
     private lateinit var wallpaperView: ImageView
@@ -35,8 +37,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var desktopAdapter: AppAdapter
     private lateinit var allAppsAdapter: AppAdapter
+    private lateinit var taskbarAdapter: TaskbarAdapter
 
     private var allApps: List<AppInfo> = emptyList()
+
+    // Apps que el usuario abrió desde el launcher; se muestran como chips en la taskbar
+    private val runningApps: MutableList<AppInfo> = mutableListOf()
 
     private val prefs by lazy { getSharedPreferences("dex_prefs", MODE_PRIVATE) }
     private val clockHandler = Handler(Looper.getMainLooper())
@@ -53,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         desktopGrid = findViewById(R.id.desktopGrid)
         allAppsList = findViewById(R.id.allAppsList)
+        runningAppsBar = findViewById(R.id.runningAppsBar)
         startMenu = findViewById(R.id.startMenu)
         searchBox = findViewById(R.id.searchBox)
         wallpaperView = findViewById(R.id.desktopWallpaper)
@@ -89,6 +96,19 @@ class MainActivity : AppCompatActivity() {
             toggleStartMenu()
         }
         allAppsList.adapter = allAppsAdapter
+
+        // Barra de tareas: click vuelve a la app, mantener presionado la saca de la lista
+        runningAppsBar.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        taskbarAdapter = TaskbarAdapter(
+            runningApps,
+            onClick = { app -> launchApp(app) },
+            onLongClick = { app, position ->
+                taskbarAdapter.removeAt(position)
+                Toast.makeText(this, "${app.label} quitada de la barra", Toast.LENGTH_SHORT).show()
+            }
+        )
+        runningAppsBar.adapter = taskbarAdapter
     }
 
     private fun loadInstalledApps() {
@@ -121,7 +141,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun launchApp(app: AppInfo) {
         val launchIntent = packageManager.getLaunchIntentForPackage(app.packageName)
-        launchIntent?.let { startActivity(it) }
+        if (launchIntent != null) {
+            startActivity(launchIntent)
+            addToRunningApps(app)
+        }
+    }
+
+    // Agrega la app a la barra de tareas si todavía no está ahí
+    private fun addToRunningApps(app: AppInfo) {
+        val alreadyOpen = runningApps.any { it.packageName == app.packageName }
+        if (!alreadyOpen) {
+            runningApps.add(app)
+            taskbarAdapter.updateList(runningApps)
+        }
     }
 
     private fun toggleStartMenu() {
