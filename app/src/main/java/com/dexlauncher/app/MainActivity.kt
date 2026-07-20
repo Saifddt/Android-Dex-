@@ -1,9 +1,15 @@
 package com.dexlauncher.app
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -34,14 +40,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchBox: EditText
     private lateinit var wallpaperView: ImageView
     private lateinit var clockText: TextView
+    private lateinit var dateText: TextView
+    private lateinit var wifiIcon: ImageView
+    private lateinit var batteryText: TextView
 
     private lateinit var desktopAdapter: AppAdapter
     private lateinit var allAppsAdapter: AppAdapter
     private lateinit var taskbarAdapter: TaskbarAdapter
 
     private var allApps: List<AppInfo> = emptyList()
-
-    // Apps que el usuario abrió desde el launcher; se muestran como chips en la taskbar
     private val runningApps: MutableList<AppInfo> = mutableListOf()
 
     private val prefs by lazy { getSharedPreferences("dex_prefs", MODE_PRIVATE) }
@@ -51,6 +58,18 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { saveWallpaper(it) }
+    }
+
+    // Se actualiza cada vez que cambia el nivel de batería del celular real
+    private val batteryReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+            if (level >= 0 && scale > 0) {
+                val percent = (level * 100) / scale
+                batteryText.text = "$percent%"
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +83,9 @@ class MainActivity : AppCompatActivity() {
         searchBox = findViewById(R.id.searchBox)
         wallpaperView = findViewById(R.id.desktopWallpaper)
         clockText = findViewById(R.id.clockText)
+        dateText = findViewById(R.id.dateText)
+        wifiIcon = findViewById(R.id.wifiIcon)
+        batteryText = findViewById(R.id.batteryText)
 
         val btnStart: ImageButton = findViewById(R.id.btnStart)
         val btnChangeWallpaper: android.widget.Button = findViewById(R.id.btnChangeWallpaper)
@@ -72,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         loadInstalledApps()
         loadSavedWallpaper()
         startClock()
+        updateWifiStatus()
 
         btnStart.setOnClickListener { toggleStartMenu() }
         btnChangeWallpaper.setOnClickListener { pickImageLauncher.launch("image/*") }
@@ -83,6 +106,21 @@ class MainActivity : AppCompatActivity() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        updateWifiStatus()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            unregisterReceiver(batteryReceiver)
+        } catch (e: Exception) {
+            // ya estaba desregistrado, no pasa nada
+        }
     }
 
     private fun setupGrids() {
@@ -97,7 +135,6 @@ class MainActivity : AppCompatActivity() {
         }
         allAppsList.adapter = allAppsAdapter
 
-        // Barra de tareas: click vuelve a la app, mantener presionado la saca de la lista
         runningAppsBar.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         taskbarAdapter = TaskbarAdapter(
@@ -147,7 +184,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Agrega la app a la barra de tareas si todavía no está ahí
     private fun addToRunningApps(app: AppInfo) {
         val alreadyOpen = runningApps.any { it.packageName == app.packageName }
         if (!alreadyOpen) {
@@ -185,23 +221,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Chequea si hay conexión de datos activa (WiFi o datos móviles) y cambia el ícono
+    private fun updateWifiStatus() {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = cm.activeNetwork
+        val capabilities = cm.getNetworkCapabilities(network)
+        val connected = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        wifiIcon.setImageResource(if (connected) R.drawable.ic_wifi_on else R.drawable.ic_wifi_off)
+    }
+
     private fun startClock() {
-        val format = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val runnable = object : Runnable {
             override fun run() {
-                clockText.text = format.format(Date())
+                val now = Date()
+                clockText.text = timeFormat.format(now)
+                dateText.text = dateFormat.format(now)
+                updateWifiStatus()
                 clockHandler.postDelayed(this, 1000 * 30)
             }
         }
         clockHandler.post(runnable)
     }
 
-    // Al ser launcher, "atrás" no debe cerrar la app ni mostrar pantalla en blanco:
-    // simplemente cierra el menú inicio si está abierto.
     override fun onBackPressed() {
         if (startMenu.visibility == android.view.View.VISIBLE) {
             startMenu.visibility = android.view.View.GONE
         }
-        // No llamamos a super para que no salga del launcher.
     }
 }

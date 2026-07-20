@@ -34,7 +34,7 @@
         android:background="@color/taskbar_bg"
         android:elevation="8dp"
         android:paddingStart="8dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="12dp">
 
         <ImageButton
             android:id="@+id/btnStart"
@@ -54,13 +54,63 @@
             android:orientation="horizontal"
             android:clipToPadding="false" />
 
-        <TextView
-            android:id="@+id/clockText"
+        <!-- Bandeja de sistema: WiFi + batería + reloj con fecha -->
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:text="00:00" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/wifiIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_wifi_on"
+                android:contentDescription="@null" />
+
+            <ImageView
+                android:id="@+id/batteryIcon"
+                android:layout_width="22dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_battery"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/batteryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="12dp"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:text="100%" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/clockText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:text="00:00" />
+
+                <TextView
+                    android:id="@+id/dateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#CCCCCC"
+                    android:textSize="10sp"
+                    android:text="01/01/2026" />
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- Menú Inicio (oculto por defecto) -->
