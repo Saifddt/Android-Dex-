@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,43 +24,64 @@
         android:paddingEnd="12dp"
         android:clipToPadding="false" />
 
-    <!-- Barra inferior tipo taskbar de Windows -->
-    <LinearLayout
+    <!-- Barra de tareas centrada, estilo Windows 11 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/taskbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:background="@color/taskbar_bg"
-        android:elevation="8dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="12dp">
+        android:elevation="8dp">
 
-        <ImageButton
-            android:id="@+id/btnStart"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_start"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/start_menu" />
-
-        <!-- Apps abiertas: aparecen acá al abrirlas desde el grid o el menú inicio -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/runningAppsBar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:orientation="horizontal"
-            android:clipToPadding="false" />
-
-        <!-- Bandeja de sistema: WiFi + batería + reloj con fecha -->
+        <!-- Grupo centrado: boton inicio + apps abiertas -->
         <LinearLayout
+            android:id="@+id/centerGroup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnStart"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_start"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/start_menu" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/runningAppsBar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+
+        <!-- Bandeja de sistema: siempre pegada a la derecha -->
+        <LinearLayout
+            android:id="@+id/systemTray"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingEnd="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnVolume"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_volume"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@null" />
 
             <ImageView
                 android:id="@+id/wifiIcon"
@@ -90,7 +112,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="end">
+                android:gravity="end"
+                android:background="?attr/selectableItemBackground"
+                android:id="@+id/clockArea">
 
                 <TextView
                     android:id="@+id/clockText"
@@ -111,9 +135,37 @@
 
         </LinearLayout>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Panel de volumen (oculto por defecto) -->
+    <LinearLayout
+        android:id="@+id/volumePanel"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        android:background="@color/start_menu_bg"
+        android:elevation="12dp"
+        android:visibility="gone"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Volumen"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+
+        <SeekBar
+            android:id="@+id/volumeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <!-- Menú Inicio (oculto por defecto) -->
+    <!-- Menu Inicio (oculto por defecto) -->
     <LinearLayout
         android:id="@+id/startMenu"
         android:layout_width="300dp"
@@ -148,6 +200,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/change_wallpaper"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnResolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cambiar resolucion (Shizuku)"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnActivateShizuku"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Activar Shizuku"
             android:layout_marginTop="8dp" />
     </LinearLayout>
 
